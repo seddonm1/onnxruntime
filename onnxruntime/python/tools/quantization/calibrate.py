@@ -86,7 +86,7 @@ class CalibraterBase:
 
     def select_tensors_to_calibrate(self, model):
         '''
-        select all quantization_candidates op type nodes' input/output tensors. 
+        select all quantization_candidates op type nodes' input/output tensors.
         returns:
             tensors (set): set of tensor name.
             value_infos (dict): tensor name to value info.
@@ -139,7 +139,7 @@ class CalibraterBase:
 
 
 class MinMaxCalibrater(CalibraterBase):
-    def __init__(self, 
+    def __init__(self,
                 model,
                 op_types_to_calibrate=[],
                 augmented_model_path='augmented_model.onnx',
@@ -178,7 +178,7 @@ class MinMaxCalibrater(CalibraterBase):
 
         added_nodes = []
         added_outputs = []
-        tensors, value_infos = self.select_tensors_to_calibrate(model) 
+        tensors, value_infos = self.select_tensors_to_calibrate(model)
 
         for tensor in tensors:
 
@@ -233,7 +233,7 @@ class MinMaxCalibrater(CalibraterBase):
         if not old_range:
             return new_range
 
-        for key, value in old_range.items(): 
+        for key, value in old_range.items():
             if self.moving_average:
                 min_value = value[0] + self.averaging_constant * (new_range[key][0] - value[0])
                 max_value = value[1] + self.averaging_constant * (new_range[key][1] - value[1])
@@ -245,7 +245,7 @@ class MinMaxCalibrater(CalibraterBase):
         return new_range
 
     def compute_range(self):
-        ''' 
+        '''
         Compute the min-max range of tensor
         :return: dictionary mapping: {added node names: (ReduceMin, ReduceMax) pairs }
         '''
@@ -295,7 +295,7 @@ class MinMaxCalibrater(CalibraterBase):
         if self.calibrate_tensors_range:
             self.calibrate_tensors_range = self.merge_range(self.calibrate_tensors_range, new_calibrate_tensors_range)
         else:
-            self.calibrate_tensors_range = new_calibrate_tensors_range 
+            self.calibrate_tensors_range = new_calibrate_tensors_range
 
         return self.calibrate_tensors_range
 
@@ -344,7 +344,7 @@ class HistogramCalibrater(CalibraterBase):
 
         added_nodes = []
         added_outputs = []
-        tensors, value_infos = self.select_tensors_to_calibrate(model) 
+        tensors, value_infos = self.select_tensors_to_calibrate(model)
 
         for tensor in tensors:
             added_outputs.append(value_infos[tensor])
@@ -359,7 +359,7 @@ class HistogramCalibrater(CalibraterBase):
 
     def collect_data(self, data_reader: CalibrationDataReader):
         '''
-        Entropy Calibrator collects operators' tensors as well as generates tensor histogram for each operator. 
+        Entropy Calibrator collects operators' tensors as well as generates tensor histogram for each operator.
         '''
         while True:
             inputs = data_reader.get_next()
@@ -393,7 +393,7 @@ class HistogramCalibrater(CalibraterBase):
         self.clear_collected_data()
 
     def compute_range(self):
-        ''' 
+        '''
         Compute the min-max range of tensor
         :return: dictionary mapping: {tensor name: (min value, max value)}
         '''
@@ -457,15 +457,15 @@ class CalibrationDataCollector(metaclass=abc.ABCMeta):
     def collect(self, name_to_arr):
         """
         Generate informative data based on given data.
-            name_to_arr : dict 
-                tensor name to NDArray data 
+            name_to_arr : dict
+                tensor name to NDArray data
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def compute_collection_result(self):
         """
-        Get the optimal result among collection data.  
+        Get the optimal result among collection data.
         """
         raise NotImplementedError
 
@@ -569,7 +569,7 @@ class HistogramCollector(CalibrationDataCollector):
             else:
                 old_num_bins = len(old_hist)
                 old_stride = 2 * old_threshold / old_num_bins
-                half_increased_bins = int((new_threshold - old_threshold) // old_stride + 1) 
+                half_increased_bins = int((new_threshold - old_threshold) // old_stride + 1)
                 new_num_bins = old_num_bins + 2 * half_increased_bins
                 new_threshold = half_increased_bins * old_stride + old_threshold
                 hist, hist_edges = np.histogram(data_arr, new_num_bins, range=(-new_threshold, new_threshold))
@@ -655,9 +655,9 @@ class HistogramCollector(CalibrationDataCollector):
         num_bins = hist.size
         zero_bin_index = num_bins // 2
         num_half_quantized_bin = num_quantized_bins // 2
-        
+
         kl_divergence = np.zeros(zero_bin_index - num_half_quantized_bin + 1)
-        thresholds = [(0, 0) for i in range(kl_divergence.size)] 
+        thresholds = [(0, 0) for i in range(kl_divergence.size)]
 
         # <------------ num bins ---------------->
         #        <--- quantized bins ---->
@@ -674,7 +674,7 @@ class HistogramCollector(CalibrationDataCollector):
         # start index                    end index       (end of iteration)
 
         for i in range(num_half_quantized_bin, zero_bin_index + 1, 1):
-            start_index = zero_bin_index - i 
+            start_index = zero_bin_index - i
             end_index = zero_bin_index + i + 1 if (zero_bin_index + i + 1) <= num_bins else num_bins
 
             thresholds[i - num_half_quantized_bin] = (float(hist_edges[start_index]), float(hist_edges[end_index]))
@@ -683,23 +683,23 @@ class HistogramCollector(CalibrationDataCollector):
 
             # reference distribution p
             p = sliced_distribution.copy() # a copy of np array
-            left_outliers_count = sum(hist[:start_index]) 
+            left_outliers_count = sum(hist[:start_index])
             right_outliers_count = sum(hist[end_index:])
             p[0] += left_outliers_count
             p[-1] += right_outliers_count
 
             # nonzeros[i] incidates whether p[i] is non-zero
             nonzeros = (p != 0).astype(np.int64)
-            
-            # quantize p.size bins into quantized bins (default 128 bins) 
+
+            # quantize p.size bins into quantized bins (default 128 bins)
             quantized_bins = np.zeros(num_quantized_bins, dtype=np.int64)
             num_merged_bins = sliced_distribution.size // num_quantized_bins
 
             # merge bins into quantized bins
             for index in range(num_quantized_bins):
-                start = index * num_merged_bins 
+                start = index * num_merged_bins
                 end = start + num_merged_bins
-                quantized_bins[index] = sum(sliced_distribution[start:end]) 
+                quantized_bins[index] = sum(sliced_distribution[start:end])
             quantized_bins[-1] += sum(sliced_distribution[num_quantized_bins * num_merged_bins:])
 
             # in order to compare p and q, we need to make length of q equals to length of p
@@ -712,7 +712,7 @@ class HistogramCollector(CalibrationDataCollector):
                 norm = sum(nonzeros[start:end])
                 if norm != 0:
                     q[start:end] = float(quantized_bins[index]) / float(norm)
-            
+
             p = smooth_distribution(p)
             q = smooth_distribution(q)
 
@@ -722,7 +722,7 @@ class HistogramCollector(CalibrationDataCollector):
                 kl_divergence[i - num_half_quantized_bin] = float('inf')
 
         min_kl_divergence_idx = np.argmin(kl_divergence)
-        optimal_threshold = thresholds[min_kl_divergence_idx] 
+        optimal_threshold = thresholds[min_kl_divergence_idx]
 
         return optimal_threshold
 
