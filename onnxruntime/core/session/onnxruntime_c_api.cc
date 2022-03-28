@@ -54,8 +54,8 @@ const OrtDmlApi* GetOrtDmlApi(_In_ uint32_t version) NO_EXCEPTION;
 #include "onnxruntime_extensions.h"
 #endif
 #if defined(_MSC_VER) && !defined(__clang__)
-//The warning is: "Do not assign the result of an allocation or a function call with an owner<T> return value to a raw pointer, use owner<T> instead(i .11)."
-//But this file is for C API. It can't use unique_ptr/shared_ptr in function signature.
+// The warning is: "Do not assign the result of an allocation or a function call with an owner<T> return value to a raw pointer, use owner<T> instead(i .11)."
+// But this file is for C API. It can't use unique_ptr/shared_ptr in function signature.
 #pragma warning(disable : 26400)
 #endif
 using namespace onnxruntime::logging;
@@ -2131,7 +2131,7 @@ ORT_API_STATUS_IMPL(OrtApis::CreateArenaCfgV2, _In_reads_(num_keys) const char* 
   API_IMPL_END
 }
 
-//Allow using raw new/delete because this is for C.
+// Allow using raw new/delete because this is for C.
 GSL_SUPPRESS(r .11)
 ORT_API(void, OrtApis::ReleaseArenaCfg, _Frees_ptr_opt_ OrtArenaCfg* ptr) {
   delete ptr;
@@ -2271,7 +2271,7 @@ Second example, if we wanted to add and remove some members, we'd do this:
     In GetApi we now make it return ort_api_3 for version 3.
 */
 
-static constexpr OrtApi ort_api_1_to_11 = {
+static constexpr OrtApi ort_api_1_to_12 = {
     // NOTE: The ordering of these fields MUST not change after that version has shipped since existing binaries depend on this ordering.
 
     // Shipped as version 1 - DO NOT MODIFY (see above text for more information)
@@ -2546,7 +2546,7 @@ static_assert(std::string_view(ORT_VERSION) == "1.11.1", "ORT_Version change det
 
 ORT_API(const OrtApi*, OrtApis::GetApi, uint32_t version) {
   if (version >= 1 && version <= ORT_API_VERSION)
-    return &ort_api_1_to_11;
+    return &ort_api_1_to_12;
 
   fprintf(stderr, "The given version [%u] is not supported, only version 1 to %u is supported in this build.\n",
           version, ORT_API_VERSION);

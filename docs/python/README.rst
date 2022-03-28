@@ -8,10 +8,17 @@ For more information on ONNX Runtime, please see `aka.ms/onnxruntime <https://ak
 Changes
 -------
 
+<<<<<<< HEAD
 1.11.1
 ^^^^^^
 
 Release Notes : https://github.com/Microsoft/onnxruntime/releases/tag/v1.11.1
+=======
+1.12.0
+^^^^^^
+
+Release Notes : https://github.com/Microsoft/onnxruntime/releases/tag/v1.12.0
+>>>>>>> 8ba52b0a0 (Bump master version to 1.12 (#10797))
 
 1.11.0
 ^^^^^^
