@@ -10,6 +10,7 @@ stages:
         clean: all
       pool: AMD-GPU
       steps:
+<<<<<<< HEAD
       - template: templates/get-docker-image-steps.yml
         parameters:
           Dockerfile: tools/ci_build/github/linux/docker/Dockerfile.manylinux2014_rocm4_2
@@ -24,11 +25,18 @@ stages:
             --build-arg LD_LIBRARY_PATH_ARG=/opt/rh/devtoolset-10/root/usr/lib64:/opt/rh/devtoolset-10/root/usr/lib:/opt/rh/devtoolset-10/root/usr/lib64/dyninst:/opt/rh/devtoolset-10/root/usr/lib/dyninst:/usr/local/lib64:/usr/local/lib
           Repository: onnxruntimetrainingrocmbuild-torch1.10.0-rocm4.2
       - template: templates/get-docker-image-steps.yml
+=======
+      - template: templates/ get-docker-image-steps.yml
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
         parameters:
           Dockerfile: tools/ci_build/github/linux/docker/Dockerfile.manylinux2014_rocm4_3_1
           Context: tools/ci_build/github/linux/docker
           DockerBuildArgs: >-
+<<<<<<< HEAD
             --build-arg TORCH_VERSION=1.10.0
+=======
+            --build-arg TORCH_VERSION=1.11.0
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
             --build-arg INSTALL_DEPS_EXTRA_ARGS=-tmur
             --build-arg BUILD_UID=$(id -u)
             --network=host --build-arg POLICY=manylinux2014 --build-arg PLATFORM=x86_64
@@ -36,12 +44,20 @@ stages:
             --build-arg PREPEND_PATH=/opt/rh/devtoolset-10/root/usr/bin:
             --build-arg LD_LIBRARY_PATH_ARG=/opt/rh/devtoolset-10/root/usr/lib64:/opt/rh/devtoolset-10/root/usr/lib:/opt/rh/devtoolset-10/root/usr/lib64/dyninst:/opt/rh/devtoolset-10/root/usr/lib/dyninst:/usr/local/lib64:/usr/local/lib
           Repository: onnxruntimetrainingrocmbuild-torch1.10.0-rocm4.3.1
+<<<<<<< HEAD
       - template: templates/get-docker-image-steps.yml
+=======
+      - template: templates/ get-docker-image-steps.yml
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
         parameters:
           Dockerfile: tools/ci_build/github/linux/docker/Dockerfile.manylinux2014_rocm5_0_1
           Context: tools/ci_build/github/linux/docker
           DockerBuildArgs: >-
+<<<<<<< HEAD
             --build-arg TORCH_VERSION=1.10.0
+=======
+            --build-arg TORCH_VERSION=1.11.0
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
             --build-arg INSTALL_DEPS_EXTRA_ARGS=-tmur
             --build-arg BUILD_UID=$(id -u)
             --network=host --build-arg POLICY=manylinux2014 --build-arg PLATFORM=x86_64
@@ -60,6 +76,7 @@ stages:
       - ROCm_build_environment
       strategy:
         matrix:
+<<<<<<< HEAD
           Python37 Torch1100 Rocm42:
             PythonVersion: '3.7'
             TorchVersion: '1.10.0'
@@ -72,6 +89,8 @@ stages:
             PythonVersion: '3.9'
             TorchVersion: '1.10.0'
             RocmVersion: '4.2'
+=======
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
           Python37 Torch1100 Rocm431:
             PythonVersion: '3.7'
             TorchVersion: '1.10.0'
@@ -102,7 +121,11 @@ stages:
         clean: true
         submodules: recursive
 
+<<<<<<< HEAD
       - template: templates/set-python-manylinux-variables-step.yml
+=======
+      - template: templates/ set-python-manylinux-variables-step.yml
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
 
       - task: CmdLine@2
         inputs:
@@ -322,8 +345,16 @@ stages:
         condition: and(succeeded(), eq(variables['DRY_RUN'], '0'))
         displayName: 'Upload Rocm wheel to release repository'
 
+<<<<<<< HEAD
       - template: templates/component-governance-component-detection-steps.yml
         parameters:
           condition: 'succeeded'
 
       - template: templates/clean-agent-build-directory-step.yml
+=======
+      - template: templates/ component-governance-component-detection-steps.yml
+        parameters:
+          condition: 'succeeded'
+
+      - template: templates/ clean-agent-build-directory-step.yml
+>>>>>>> 8237568b6 (Fix the rocm packaging pipeline package upload problem (#11174))
