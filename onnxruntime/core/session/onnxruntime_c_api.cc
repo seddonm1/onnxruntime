@@ -994,6 +994,42 @@ ORT_API_STATUS_IMPL(OrtApis::SynchronizeBoundOutputs, _Inout_ OrtIoBinding* bind
   API_IMPL_END
 }
 
+ORT_API_STATUS_IMPL(OrtApis::CopyOutputsAcrossDevices, _Inout_ OrtIoBinding* binding_ptr, size_t output_names_len, _Inout_updates_all_(output_names_len) OrtValue** output) {
+  API_IMPL_BEGIN
+  const auto& outputs = binding_ptr->binding_->GetOutputs();
+  if (outputs.empty()) {
+    return nullptr;
+  }
+
+  constexpr int queue_id = 0;
+
+  std::vector<OrtValue> fetches(output_names_len);
+  for (size_t i = 0; i != output_names_len; ++i) {
+    if (output[i] != nullptr) {
+      ::OrtValue& value = *(output[i]);
+      if (value.Fence())
+        value.Fence()->BeforeUsingAsOutput(onnxruntime::kCpuExecutionProvider, queue_id);
+      fetches[i] = value;
+    }
+  }
+
+  auto status = binding_ptr->binding_->CopyOutputsAcrossDevices(fetches);
+
+  if (!status.IsOK())
+    return ToOrtStatus(status);
+  for (size_t i = 0; i != output_names_len; ++i) {
+    ::OrtValue& value = fetches[i];
+    if (value.Fence())
+      value.Fence()->BeforeUsingAsInput(onnxruntime::kCpuExecutionProvider, queue_id);
+    if (output[i] == nullptr) {
+      output[i] = new OrtValue(value);
+    }
+  }
+
+  return nullptr;
+  API_IMPL_END
+}
+
 ORT_API_STATUS_IMPL(OrtApis::IsTensor, _In_ const OrtValue* value, _Out_ int* out) {
   auto v = reinterpret_cast<const ::OrtValue*>(value);
   *out = v->IsTensor() ? 1 : 0;
@@ -2522,6 +2558,7 @@ static constexpr OrtApi ort_api_1_to_12 = {
     &OrtApis::SessionOptionsAppendExecutionProvider_MIGraphX,
     // End of Version 11 - DO NOT MODIFY ABOVE (see above text for more information)
     &OrtApis::AddExternalInitializers,
+    &OrtApis::CopyOutputsAcrossDevices,
 };
 
 // Asserts to do a some checks to ensure older Versions of the OrtApi never change (will detect an addition or deletion but not if they cancel out each other)

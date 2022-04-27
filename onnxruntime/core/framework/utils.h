@@ -69,6 +69,11 @@ bool ProviderIsCpuBased(const std::string& provider_type);
 common::Status CopyOneInputAcrossDevices(const SessionState& session_state, const std::string& input_name,
                                          const OrtValue& orig_mlvalue, OrtValue& new_mlvalue);
 
+common::Status CopyOutputsAcrossDevices(const SessionState& session_state,
+                                        const std::vector<OrtValue>& fetches,
+                                        std::vector<OrtValue>& user_fetches,
+                                        const std::vector<MLValueCopyInfo>& copy_info);
+
 // Searches the allocation plan from the session_state to find the OrtMemoryInfo for the value 'name'.
 const OrtMemoryInfo& FindMemoryInfoForValue(const SessionState& session_state,
                                             const std::string& name);

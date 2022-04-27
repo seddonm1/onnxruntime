@@ -95,6 +95,8 @@ class IOBinding {
   void ClearInputs();
   IOBinding(const SessionState& session_state);
 
+  common::Status CopyOutputsAcrossDevices(std::vector<OrtValue>& fetches);
+
  private:
   friend InferenceSession;
 

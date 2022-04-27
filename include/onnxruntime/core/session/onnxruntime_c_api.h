@@ -3329,6 +3329,9 @@ struct OrtApi {
   ORT_API2_STATUS(AddExternalInitializers, _In_ OrtSessionOptions* options,
                   _In_reads_(input_len) const char* const* initializer_names,
                   _In_reads_(input_len) const OrtValue* const* initializers, size_t initializers_num);
+
+
+  ORT_API2_STATUS(CopyOutputsAcrossDevices, _Inout_ OrtIoBinding* binding_ptr, size_t output_names_len, _Inout_updates_all_(output_names_len) OrtValue** output);
 };
 
 /*

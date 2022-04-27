@@ -342,5 +342,5 @@ ORT_API(void, ReleaseCUDAProviderOptions, _Frees_ptr_opt_ OrtCUDAProviderOptions
 ORT_API_STATUS_IMPL(AddExternalInitializers, _In_ OrtSessionOptions* options,
                     _In_reads_(initializers_num) const char* const* initializer_names,
                     _In_reads_(initializers_num) const OrtValue* const* initializers, size_t initializers_num);
-
+ORT_API_STATUS_IMPL(CopyOutputsAcrossDevices, _Inout_ OrtIoBinding* binding_ptr, size_t output_names_len, _Inout_updates_all_(output_names_len) OrtValue** output);
 }  // namespace OrtApis

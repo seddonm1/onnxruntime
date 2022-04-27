@@ -138,4 +138,13 @@ AllocatorPtr IOBinding::GetCPUAllocator(int id, onnxruntime::ProviderType provid
   return cpu_provider->GetAllocator(0, OrtMemTypeDefault);
 }
 
+common::Status IOBinding::CopyOutputsAcrossDevices(std::vector<OrtValue>& fetches) {
+  FeedsFetchesInfo info(feed_names_, output_names_, session_state_.GetOrtValueNameIdxMap());
+  FeedsFetchesManager feeds_fetches_manager{std::move(info)};
+  const auto& fetch_copy_info = feeds_fetches_manager.GetFetchesDeviceCopyInfo();
+
+  ORT_RETURN_IF_ERROR(utils::CopyOutputsAcrossDevices(session_state_, outputs_, fetches, fetch_copy_info));
+  return Status::OK();
+}
+
 }  // namespace onnxruntime
