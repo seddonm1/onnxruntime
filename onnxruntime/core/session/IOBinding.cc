@@ -141,7 +141,12 @@ AllocatorPtr IOBinding::GetCPUAllocator(int id, onnxruntime::ProviderType provid
 common::Status IOBinding::CopyOutputsAcrossDevices(std::vector<OrtValue>& fetches) {
   FeedsFetchesInfo info(feed_names_, output_names_, session_state_.GetOrtValueNameIdxMap());
   FeedsFetchesManager feeds_fetches_manager{std::move(info)};
-  const auto& fetch_copy_info = feeds_fetches_manager.GetFetchesDeviceCopyInfo();
+  auto& fetch_copy_info = feeds_fetches_manager.GetMutableFetchesDeviceCopyInfo();
+
+  const auto& output_devices = GetOutputsDeviceInfo();
+  for (size_t i = 0; i != fetch_copy_info.size(); ++i) {
+    fetch_copy_info[i].source_device = output_devices[0];
+  }
 
   ORT_RETURN_IF_ERROR(utils::CopyOutputsAcrossDevices(session_state_, outputs_, fetches, fetch_copy_info));
   return Status::OK();
